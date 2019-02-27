@@ -1,0 +1,14 @@
+{
+    "name": "realtime-chat",
+    "version": "2.0.0",
+    "dependencies": {
+        "ent": "^2.2.0",
+        "express": "^4.16.4",
+        "socket.io": "^2.1.1"
+    },
+    "author": "Svd115",
+    "description": "WebRTC 1.0 chat service working on nodejs and using socket.io for signaling",
+	"engines": {
+		"node": "10.11.0"
+	}
+}

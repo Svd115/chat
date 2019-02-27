@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+			<link rel="icon" type="image"  href="https://png.icons8.com/office/40/000000/speech-bubble.png"/>
+			<meta charset="utf-8" />
+			<title>Node_js chat service using socket.io</title>
+			
+			<!-- Jquery -->
+			<script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+	
+			<!-- Bootstrap -->
+			<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+			
+			<!-- Font Awesome -->
+			<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+			<!-- CSS -->
+			<link rel="stylesheet" href="/css/index.css" />
+		</head>
+	 
+		<body>
+			<div class="container-fluid p-3 fixed-top alert-danger" id="infos" role="alert" style="visibility:hidden">
+				<p class="col m-0"><b></b></p>
+			</div>
+			
+			<div class="container-fluid p-0" id="start">
+				<div class="col-lg-4 p-2 bloc">
+					<p>Click on "Start" button to start the service.</p>
+					<button id="start_btn" type="submit" class="btn btn-primary ">Start</button>
+				</div>
+			</div>
+			
+			<div class="container-fluid p-0" id="pseudo" style="display:none">
+				<div class="col-lg-4 p-2 bloc">
+					<p>Please choose your pseudo before chatting. Less of 15 characters !</p>
+					<form id="login">
+						<div class="form-group">
+							<input type="text" id="pseudo" class="form-control" placeholder="Your pseudo" autofocus>
+						</div>
+						<button type="submit" class="btn btn-primary">Send</button>
+					</form>
+				</div>
+			</div>
+			
+			<div class="container-fluid p-0" id="search" style="display:none">
+				<div class="col-lg-4 p-2 bloc">
+					<p>Click on "Search" button to start a new conversation.</p>
+					<button type="submit" id="start_conversation" class="btn btn-primary">Search</button>
+				</div>
+			</div>
+			
+			<div class="container-fluid p-0" id="searching" style="display:none">
+				<div class="col-lg-4 p-2 bloc">
+					<p>Searching for a user...</p>
+				</div>
+			</div>
+			
+			<div class="container-fluid p-0" id="chat" style="display:none">
+				<div class="p-0 m-0 bloc" style="width:100%;height:100%">
+					<div class="" id="chat_head">
+						<i id="chat_leave" class="fa fa-times" title="leave this chat room"></i>
+						<h5 id="chat_with"></h5>
+					</div>
+					
+					<div class="p-2" id="chat_box">
+					</div>
+					
+					<div id="calling_animation" style="display:none">
+					</div>
+					
+					<div class="p-0" id="chat_video">
+						<div id="local_video">
+							<video class="m-0 p-0" id="local" autoplay>Here is your friend video</video>
+						</div>
+						
+						<div id="remote_video">
+							<video class="m-0 p-0" id="remote" autoplay>Here is your video</video>
+						</div>
+						
+						<button type="button" id="close_call_btn" class="btn btn-link" title="Close your conversation" style="display:none">
+							<i class="fas fa-phone-slash fa-2x"></i>
+						</button>
+					</div>
+					
+					<div id="all_chat_btn">
+						<div>
+							<button type="button" id="emoji_btn" class="btn btn-light" title="Add an emoji">
+								<i class="far fa-laugh-beam"></i>
+							</button>
+							<div id="emoji-content">
+							</div>
+						</div>
+						<div>
+							<button type="button" id="image_btn" class="file btn btn-light" title="Add an image">
+								<i class="fa fa-image"></i>
+								<input id="img_btn_imput" type="file" name="img"/>
+							</button>
+						</div>
+						<div>
+							<button type="button" id="video_btn" class="btn btn-light" title="Start a video chat">
+								<i class="fas fa-video"></i>
+							</button>
+						</div>
+					</div>
+					
+					<div id="chat_text">
+						<form id="chat_form" class="form-inline">
+							<textarea class="col form-control" id="chat_message" placeholder="Your message..." rows="1" autofocus></textarea>
+
+							<button type="submit" class="col-2 p-2 form-control btn btn-primary">Send</button>
+						</form>
+					</div>
+				</div>
+			</div>
+			
+			<script src="/socket.io/socket.io.js"></script>
+			<script type="text/javascript">
+				var receiving_message_sound = new Audio('/sound/receiving_message.mp3'); 
+				var sending_message_sound = new Audio('/sound/sending_message.mp3');  
+				var receiving_call_sound = new Audio('/sound/receiving_call.mp3'); 
+
+				var type_img_accepted = new Array("image/png", "image/jpeg", "image/jpg");
+
+				let socket;
+				var pseudo = "";
+				var friend = "";
+
+				var writing = false;
+				
+				const constraints = {audio: true, video: true};
+				const configuration = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'}]};
+				let pc;
+				let OfferAnswer = {'offerToReceiveAudio':true,'offerToReceiveVideo':true};
+			</script>
+			<script src="/js/io_listeners.js"></script>
+			<script src="/js/chat_text.js"></script>
+			<script src="/js/chat_video.js"></script>
+		
+		
+		
+		</body>
+	</html>
