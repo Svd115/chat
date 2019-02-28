@@ -1,4 +1,4 @@
-	
+﻿	
 	$("#video_btn").on("click", function(){
 		
 		socket.emit("calling");
@@ -66,16 +66,19 @@
 		calling_animation(animation);
 		
 		$("#accepting_call").on("click", function(){
-			//receiving_call_sound.pause();
-			//receiving_call_sound.currentTime = 0;
+			end_call_sound();
 			accepting_call();
 		});
 		
 		$("#declining_call").on("click", function(){
-			//receiving_call_sound.pause();
-			//receiving_call_sound.currentTime = 0;
+			end_call_sound();
 			declining_call();
 		});
+
+		end_call_sound(){
+			receiving_call_sound.pause();
+			receiving_call_sound.currentTime = 0;
+		}
 	}
 	
 	function accepting_call(){
