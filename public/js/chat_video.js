@@ -75,7 +75,7 @@
 			declining_call();
 		});
 
-		end_call_sound(){
+		function end_call_sound(){
 			receiving_call_sound.pause();
 			receiving_call_sound.currentTime = 0;
 		}
