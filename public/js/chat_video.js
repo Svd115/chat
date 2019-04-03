@@ -88,7 +88,7 @@
 	
 	function calling_accepted(){
 		accepted_call_animation();
-		start_rtc();
+		start_rtc(true);
 	}
 	
 	function declining_call(){
@@ -136,7 +136,7 @@
 		localVideo.removeAttr("srcObject");
 	}
 	
-	function start_rtc(){
+	function start_rtc(isOffer){
 		// initialiser la connexion
 		pc = new RTCPeerConnection(configuration);
 		
@@ -147,11 +147,11 @@
 			}
 		}
 		
-		// creer l'offre en cas de negociation
-		pc.onnegotiationneeded = () => {
-			pc.createOffer(OfferAnswer)
-			.then(function(offer) {
-				pc.setLocalDescription(offer);
+		// l'appelant créé l'offre
+		if(isOffer){
+			pc.createOffer(OfferAnswer).
+			then(function(offer){
+				return pc.setLocalDescription(offer);
 			})
 			.then(function(){
 				socket.emit("sdp", pc.localDescription);
@@ -195,7 +195,7 @@
 	function signaling(message){
 		if(!pc){
 			$("#video").css("display", "");
-			start_rtc();
+			start_rtc(false);
 		}
 		
 		// Si on recoit une description
