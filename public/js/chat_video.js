@@ -151,10 +151,7 @@
 		if(isOffer){
 			
 			pc.onnegotiationneeded = () => {
-				pc.createOffer(OfferAnswer).
-				then(function(offer){
-					return pc.setLocalDescription(offer);
-				})
+				pc.setLocalDescription(pc.createOffer(OfferAnswer))
 				.then(function(){
 					socket.emit("sdp", pc.localDescription);
 				})
