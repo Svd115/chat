@@ -157,6 +157,7 @@
 				socket.emit("sdp", pc.localDescription);
 			})
 			.catch(function(err){
+				error("Erreur création offre de isCaller :<br/>"+err);
 				console.log("Erreur création offre de isCaller :");
 				console.log(err);
 				console.log("-----------");
@@ -184,6 +185,7 @@
 		})
 		.catch(function(err){
 			// en cas d'erreur
+			error("Erreur getUserMedia :<br/>"+err);
 			console.log("Erreur getUserMedia :");
 			console.log(err);
 			console.log("-----------");
@@ -203,6 +205,7 @@
 			pc.setRemoteDescription(sdp)
 			.catch(function(err){
 				// en cas d'erreur
+				error("Erreur setRemoteDescription :<br/>"+err);
 				console.log("Erreur setRemoteDescription :");
 				console.log(err);
 				console.log("-----------");
@@ -219,6 +222,7 @@
 				})
 				.catch(function(err){
 					// en cas d'erreur
+					error("Erreur réception d'une offre sdp par Callee :<br/>"+err);
 					console.log("Erreur réception d'une offre sdp par Callee :");
 					console.log(err);
 					console.log("-----------");
@@ -230,18 +234,20 @@
 			pc.addIceCandidate(message.candidate)
 			.catch(function(err){
 				// en cas d'erreur
+				error("Erreur ice candidate :<br/>"+err);
 				console.log("Erreur ice candidate :");
 				console.log(err);
 				console.log("-----------");
 			});
 		}
 		else{
+			error("Erreur reception de message :<br/>"+message);
 			console.log("Erreur reception de message :");
 			console.log(message);
 			console.log("-----------");
 		}
 	}
 	
-	
-	
-	
+	function error(message){
+		infos("danger", message, true);
+	}
