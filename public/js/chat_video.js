@@ -194,7 +194,7 @@
 		});
 	}
 	
-	function signaling(message){
+	async function signaling(message){
 		if(!pc){
 			$("#video").css("display", "");
 			start_rtc(false);
@@ -204,42 +204,22 @@
 		if(message.type === "sdp"){
 			var sdp = message.sdp;
 			
+		try{
 			if(sdp.type === "offer"){
-				pc.setRemoteDescription(sdp)
-				.then(function() {
-					return pc.createAnswer(OfferAnswer)
-				})
-				.then(function(answer) {
-					pc.setLocalDescription(answer);
-				})
-				.then(function() {
-					socket.emit("sdp", pc.localDescription);
-				})
-				.catch(function(err){
-					// en cas d'erreur
-					error("Erreur setRemoteDescription ici:<br/>"+err+"<br/>SDP :"+sdp);
-					console.log("Erreur setRemoteDescription :");
-					console.log(err);
-					console.log("-----------");
-				});
-
-			}
+				await pc.setRemoteDescription(sdp);
+				await pc.setLocalDescription(await pc.createAnswer(OfferAnswer));
+				socket.emit("sdp", pc.localDescription);
+			} 
 			else{
-				pc.setRemoteDescription(sdp)
-				.catch(function(err){
-					// en cas d'erreur
-					error("Erreur setRemoteDescription :<br/>"+err+"<br/>SDP :"+sdp);
-					console.log("Erreur setRemoteDescription :");
-					console.log(err);
-					console.log("-----------");
-				});
-
-			}
-			
-			
-			
-			
-		
+				await pc.setRemoteDescription(desc);
+			}	
+		}
+		catch(err){
+			error("Erreur  ici:<br/>"+err+"<br/>SDP :"+sdp);
+			console.log(err);
+			console.log("-----------");
+		}		
+				
 		}
 		// Sinon on recoit un candidate
 		else if(message.type === "candidate"){
