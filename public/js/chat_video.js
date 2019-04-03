@@ -136,7 +136,7 @@
 		localVideo.removeAttr("srcObject");
 	}
 	
-	function start_rtc(isOffer){
+	function start_rtc(isCaller){
 		// initialiser la connexion
 		pc = new RTCPeerConnection(configuration);
 		
@@ -148,21 +148,19 @@
 		}
 		
 		// l'appelant créé l'offre
-		if(isOffer){
-			
-			pc.onnegotiationneeded = () => {
-				pc.setLocalDescription(pc.createOffer(OfferAnswer))
-				.then(function(){
-					socket.emit("sdp", pc.localDescription);
-				})
-				.catch(function(err){
-					error("Erreur création offre de isCaller :<br/>"+err);
-					console.log("Erreur création offre de isCaller :");
-					console.log(err);
-					console.log("-----------");
-				});
+		if(isCaller){
+			pc.onnegotiationneeded = async () => {
+			try {
+				await pc.setLocalDescription(await pc.createOffer(OfferAnswer));
+				socket.emit("sdp", pc.localDescription);
 			}
-		}
+			catch (err) {
+				error("Erreur création offre de isCaller :<br/>"+err);
+				console.log("Erreur création offre de isCaller :");
+				console.log(err);
+				console.log("-----------");
+			}
+		};
 		
 		// affiche le flux vidéo de l'autre paire
 		pc.ontrack = (event) => {
