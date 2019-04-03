@@ -1,4 +1,4 @@
-﻿	
+	
 	$("#video_btn").on("click", function(){
 		
 		socket.emit("calling");
@@ -66,19 +66,16 @@
 		calling_animation(animation);
 		
 		$("#accepting_call").on("click", function(){
-			end_call_sound();
+			//receiving_call_sound.pause();
+			//receiving_call_sound.currentTime = 0;
 			accepting_call();
 		});
 		
 		$("#declining_call").on("click", function(){
-			end_call_sound();
+			//receiving_call_sound.pause();
+			//receiving_call_sound.currentTime = 0;
 			declining_call();
 		});
-
-		function end_call_sound(){
-			receiving_call_sound.pause();
-			receiving_call_sound.currentTime = 0;
-		}
 	}
 	
 	function accepting_call(){
@@ -88,7 +85,7 @@
 	
 	function calling_accepted(){
 		accepted_call_animation();
-		start_rtc(true);
+		start_rtc();
 	}
 	
 	function declining_call(){
@@ -136,7 +133,7 @@
 		localVideo.removeAttr("srcObject");
 	}
 	
-	function start_rtc(isCaller){
+	function start_rtc(){
 		// initialiser la connexion
 		pc = new RTCPeerConnection(configuration);
 		
@@ -147,24 +144,22 @@
 			}
 		}
 		
-		// l'appelant créé l'offre
-		if(isCaller){
-			pc.onnegotiationneeded = () => {
-				pc.createOffer(OfferAnswer)
-				.then(function(offer) {
-					pc.setLocalDescription(offer);
-				})
-				.then(function(){
-					socket.emit("sdp", pc.localDescription);
-				})
-				.catch(function(err){
-					error("Erreur création offre de isCaller :<br/>"+err);
-					console.log("Erreur création offre de isCaller :");
-					console.log(err);
-					console.log("-----------");
-				});
-			}
-		};
+		// creer l'offre en cas de negociation
+		pc.onnegotiationneeded = () => {
+			pc.createOffer(OfferAnswer)
+			.then(function(offer) {
+				pc.setLocalDescription(offer);
+			})
+			.then(function(){
+				socket.emit("sdp", pc.localDescription);
+			})
+			.catch(function(err){
+				error("Erreur création offre de isCaller :<br/>"+err);
+				console.log("Erreur création offre de isCaller :");
+				console.log(err);
+				console.log("-----------");
+			});
+		}
 		
 		// affiche le flux vidéo de l'autre paire
 		pc.ontrack = (event) => {
@@ -194,32 +189,42 @@
 		});
 	}
 	
-	async function signaling(message){
+	function signaling(message){
 		if(!pc){
 			$("#video").css("display", "");
-			start_rtc(false);
+			start_rtc();
 		}
 		
 		// Si on recoit une description
 		if(message.type === "sdp"){
 			var sdp = message.sdp;
 			
-		try{
+			pc.setRemoteDescription(sdp)
+			.catch(function(err){
+				// en cas d'erreur
+				error("Erreur setRemoteDescription :<br/>"+err);
+				console.log("Erreur setRemoteDescription :");
+				console.log(err);
+				console.log("-----------");
+			});
+		
 			if(sdp.type === "offer"){
-				await pc.setRemoteDescription(sdp);
-				await pc.setLocalDescription(await pc.createAnswer(OfferAnswer));
-				socket.emit("sdp", pc.localDescription);
-			} 
-			else{
-				await pc.setRemoteDescription(desc);
-			}	
-		}
-		catch(err){
-			error("Erreur  ici:<br/>"+err+"<br/>SDP :"+sdp);
-			console.log(err);
-			console.log("-----------");
-		}		
-				
+				// l'user recoit une offre, on va l'enregistrer, puis creer et envoyer une réponse
+				pc.createAnswer(OfferAnswer)
+				.then(function(answer) {
+					pc.setLocalDescription(answer);
+				})
+				.then(function() {
+					socket.emit("sdp", pc.localDescription);
+				})
+				.catch(function(err){
+					// en cas d'erreur
+					error("Erreur réception d'une offre sdp par Callee :<br/>"+err);
+					console.log("Erreur réception d'une offre sdp par Callee :");
+					console.log(err);
+					console.log("-----------");
+				});
+			}
 		}
 		// Sinon on recoit un candidate
 		else if(message.type === "candidate"){
@@ -243,3 +248,7 @@
 	function error(message){
 		infos("danger", message, true);
 	}
+	
+	
+	
+	
