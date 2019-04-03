@@ -2,7 +2,7 @@
 	<html>
 		<head>
 			<meta charset="utf-8" />
-			<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+			<meta name="viewport" content="width=device-width, initial-scale=1">
 			<link rel="icon" type="image"  href="https://png.icons8.com/office/40/000000/speech-bubble.png"/>
 			<meta charset="utf-8" />
 			<title>Node_js chat service using socket.io</title>
@@ -72,7 +72,7 @@
 					
 					<div class="p-0" id="chat_video">
 						<div id="local_video">
-							<video class="m-0 p-0" id="local" autoplay muted="muted">Here is your friend video</video>
+							<video class="m-0 p-0" id="local" muted autoplay>Here is your friend video</video>
 						</div>
 						
 						<div id="remote_video">
@@ -119,10 +119,11 @@
 			<script type="text/javascript">
 				var receiving_message_sound = new Audio('/sound/receiving_message.mp3'); 
 				var sending_message_sound = new Audio('/sound/sending_message.mp3');  
-				var receiving_call_sound = new Audio('/sound/receiving_call.mp3');
-				receiving_call_sound.loop = true;
+				var receiving_call_sound = new Audio('/sound/receiving_call.mp3'); 
 
 				var type_img_accepted = new Array("image/png", "image/jpeg", "image/jpg");
+				
+				
 
 				let socket;
 				var pseudo = "";
@@ -130,7 +131,7 @@
 
 				var writing = false;
 				
-				const constraints = {audio: {echoCancellation: true}, video: { facingMode: "user" }};
+				const constraints = {audio: true, video: true};
 				const configuration = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'}]};
 				let pc;
 				let OfferAnswer = {'offerToReceiveAudio':true,'offerToReceiveVideo':true};
@@ -140,6 +141,7 @@
 					
 					if(level === "alert-success"){
 						var remove_class = "alert-danger";
+						
 					}
 					else{
 						var remove_class = "alert-success";
@@ -151,7 +153,7 @@
 					var fade = function(){
 						return $("#infos").fadeOut(5000, function(){
 							$(this).css({"display": "block", "visibility": "hidden"});
-						});
+						}) ;
 					}
 					
 					$("#infos").removeClass(remove_class);
@@ -159,7 +161,6 @@
 					if(!$("#infos").hasClass(level)){
 						$("#infos").addClass(level);
 					}
-					
 					$("#infos").stop(true, true);
 					$("#infos").css("visibility", "visible");
 					$("#infos p b").html(message);
@@ -168,6 +169,7 @@
 						fade();
 					}
 				}
+				
 			</script>
 			<script src="/js/io_listeners.js"></script>
 			<script src="/js/chat_text.js"></script>
