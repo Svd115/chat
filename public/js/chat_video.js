@@ -205,7 +205,7 @@
 			pc.setRemoteDescription(sdp)
 			.catch(function(err){
 				// en cas d'erreur
-				error("Erreur setRemoteDescription :<br/>"+err);
+				error("Erreur setRemoteDescription :<br/>"+err+"<br/>SDP :"+sdp);
 				console.log("Erreur setRemoteDescription :");
 				console.log(err);
 				console.log("-----------");
