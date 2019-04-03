@@ -204,15 +204,6 @@
 		if(message.type === "sdp"){
 			var sdp = message.sdp;
 			
-			pc.setRemoteDescription(sdp)
-			.catch(function(err){
-				// en cas d'erreur
-				error("Erreur setRemoteDescription :<br/>"+err+"<br/>SDP :"+sdp);
-				console.log("Erreur setRemoteDescription :");
-				console.log(err);
-				console.log("-----------");
-			});
-		
 			if(sdp.type === "offer"){
 				// l'user recoit une offre, on va l'enregistrer, puis creer et envoyer une réponse
 				pc.createAnswer(OfferAnswer)
@@ -226,6 +217,16 @@
 					// en cas d'erreur
 					error("Erreur réception d'une offre sdp par Callee :<br/>"+err);
 					console.log("Erreur réception d'une offre sdp par Callee :");
+					console.log(err);
+					console.log("-----------");
+				});
+			}
+			else{
+				pc.setRemoteDescription(sdp)
+				.catch(function(err){
+					// en cas d'erreur
+					error("Erreur setRemoteDescription :<br/>"+err+"<br/>SDP :"+sdp);
+					console.log("Erreur setRemoteDescription :");
 					console.log(err);
 					console.log("-----------");
 				});
