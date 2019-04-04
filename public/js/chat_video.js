@@ -180,9 +180,8 @@
 		.then(function(stream){
 			// afficher la camera avant de l'envoyer à l'autre paire
 			$("#local")[0].srcObject = stream;
-			if($("#local")[0].srcObject){
-				$("#local_video").css("background-image", "none").css("background-color", "black");
-			}
+			$("#local_video").css("background-image", "none").css("background-color", "black");
+			
 			stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 		})
 		.catch(function(err){
