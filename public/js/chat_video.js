@@ -211,7 +211,7 @@
 				console.log("Erreur setRemoteDescription :");
 				console.log(err);
 				console.log("-----------");
-				console.log(sdp);
+				console.log(message);
 			});
 		
 			if(sdp.type === "offer"){
