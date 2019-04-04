@@ -142,6 +142,8 @@
 		// send any ice candidates to the other peer
 		pc.onicecandidate = (event) => {
 			socket.emit("candidate", event.candidate);
+			console.log("Candidate send");
+			console.log("-----------");
 		};
 
 		// let the "negotiationneeded" event trigger offer generation
@@ -150,6 +152,8 @@
 				await pc.setLocalDescription(await pc.createOffer());
 				// send the offer to the other peer
 				socket.emit("sdp", pc.localDescription);
+				console.log("onnegotiationneeded ici");
+				console.log("-----------");
 			}
 			catch (err) {
 				error("Erreur onnegotiationneeded :<br/>"+err);
@@ -165,6 +169,8 @@
 			$("#local")[0].srcObject = stream;
 			// Render the media even before ontrack fires.
 			$("#remote")[0].srcObject = new MediaStream(pc.getReceivers().map((r) => r.track));
+			console.log("MediaStream");
+			console.log("-----------");
 		}
 		catch (err) {
 			error("Erreur getUserMedia :<br/>"+err);
@@ -176,6 +182,7 @@
 	
 	async function signaling(message){
 		if (!pc){
+			$("#video").css("display", "");
 			start_rtc();
 		}
 		
@@ -188,13 +195,19 @@
 					await pc.setRemoteDescription(sdp);
 					await pc.setLocalDescription(await pc.createAnswer());
 					socket.emit("sdp", pc.localDescription);
+					console.log("get offer");
+					console.log("-----------");
 				}
 				else {
 					await pc.setRemoteDescription(sdp);
+					console.log("get answer");
+					console.log("-----------");
 				}
 			}
 			else {
 				await pc.addIceCandidate(message.candidate);
+				console.log("get candidate");
+				console.log("-----------");
 			}
 		}
 		catch (err) {
