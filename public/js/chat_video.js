@@ -148,8 +148,7 @@
 		}
 		
 		// l'appelant créé l'offre
-		if(isCaller){
-			pc.onnegotiationneeded = () => {
+		pc.onnegotiationneeded = () => {
 				pc.createOffer(OfferAnswer)
 				.then(function(offer) {
 					pc.setLocalDescription(offer);
@@ -164,7 +163,6 @@
 					console.log("-----------");
 				});
 			}
-		};
 		
 		// affiche le flux vidéo de l'autre paire
 		pc.ontrack = (event) => {
