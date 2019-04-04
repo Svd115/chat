@@ -157,7 +157,7 @@
 			pc.onnegotiationneeded = function() {
 				pc.createOffer()
 				.then(function(offer) {
-					return pc.setLocalDescription(offer);
+					return pc.setLocalDescription(new RTCSessionDescription(offer));
 				})
 				.then(function() {
 					// Send the offer to the remote peer through the signaling server
@@ -209,7 +209,7 @@
 				if (pc.remoteDescription.type == "offer"){
 					pc.createAnswer()
 					.then(function(answer) {
-						return pc.setLocalDescription(answer);
+						return pc.setLocalDescription(new RTCSessionDescription(answer));
 					})
 					.then(function(answer) {
 						socket.emit("sdp", pc.localDescription);
@@ -223,6 +223,10 @@
 						console.log(err);
 						console.log("-----------");
 					});
+				}
+				else{
+					console.log("get answer");
+					console.log("-----------");
 				}
 			})
 			.catch(function(err){
