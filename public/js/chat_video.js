@@ -1,4 +1,4 @@
-	
+﻿	
 	$("#video_btn").on("click", function(){
 		
 		socket.emit("calling");
@@ -66,16 +66,19 @@
 		calling_animation(animation);
 		
 		$("#accepting_call").on("click", function(){
-			//receiving_call_sound.pause();
-			//receiving_call_sound.currentTime = 0;
+			end_call_sound();
 			accepting_call();
 		});
 		
 		$("#declining_call").on("click", function(){
-			//receiving_call_sound.pause();
-			//receiving_call_sound.currentTime = 0;
+			end_call_sound();
 			declining_call();
 		});
+
+		function end_call_sound(){
+			receiving_call_sound.pause();
+			receiving_call_sound.currentTime = 0;
+		}
 	}
 	
 	function accepting_call(){
@@ -85,7 +88,7 @@
 	
 	function calling_accepted(){
 		accepted_call_animation();
-		start_rtc();
+		start_rtc(true);
 	}
 	
 	function declining_call(){
@@ -133,7 +136,7 @@
 		localVideo.removeAttr("srcObject");
 	}
 	
-	function start_rtc(){
+	function start_rtc(isCaller){
 		// initialiser la connexion
 		pc = new RTCPeerConnection(configuration);
 		
@@ -144,22 +147,24 @@
 			}
 		}
 		
-		// creer l'offre en cas de negociation
-		pc.onnegotiationneeded = () => {
-			pc.createOffer(OfferAnswer)
-			.then(function(offer) {
-				pc.setLocalDescription(offer);
-			})
-			.then(function(){
-				socket.emit("sdp", pc.localDescription);
-			})
-			.catch(function(err){
-				error("Erreur création offre de isCaller :<br/>"+err);
-				console.log("Erreur création offre de isCaller :");
-				console.log(err);
-				console.log("-----------");
-			});
-		}
+		// l'appelant créé l'offre
+		if(isCaller){
+			pc.onnegotiationneeded = () => {
+				pc.createOffer(OfferAnswer)
+				.then(function(offer) {
+					pc.setLocalDescription(offer);
+				})
+				.then(function(){
+					socket.emit("sdp", pc.localDescription);
+				})
+				.catch(function(err){
+					error("Erreur création offre de isCaller :<br/>"+err);
+					console.log("Erreur création offre de isCaller :");
+					console.log(err);
+					console.log("-----------");
+				});
+			}
+		};
 		
 		// affiche le flux vidéo de l'autre paire
 		pc.ontrack = (event) => {
@@ -192,7 +197,7 @@
 	function signaling(message){
 		if(!pc){
 			$("#video").css("display", "");
-			start_rtc();
+			start_rtc(false);
 		}
 		
 		// Si on recoit une description
@@ -248,7 +253,3 @@
 	function error(message){
 		infos("danger", message, true);
 	}
-	
-	
-	
-	
