@@ -205,6 +205,25 @@
 			var sdp = message.sdp;
 			
 			pc.setRemoteDescription(sdp)
+			.then(function() {
+				if(sdp.type === "offer"){
+					// l'user recoit une offre, on va l'enregistrer, puis creer et envoyer une réponse
+					pc.createAnswer(OfferAnswer)
+					.then(function(answer) {
+						pc.setLocalDescription(answer);
+					})
+					.then(function() {
+						socket.emit("sdp", pc.localDescription);
+					})
+					.catch(function(err){
+						// en cas d'erreur
+						error("Erreur réception d'une offre sdp par Callee :<br/>"+err);
+						console.log("Erreur réception d'une offre sdp par Callee :");
+						console.log(err);
+						console.log("-----------");
+					});
+				}
+			})
 			.catch(function(err){
 				// en cas d'erreur
 				error("Erreur setRemoteDescription :<br/>"+err);
@@ -214,24 +233,6 @@
 				console.log(message.sdp);
 				console.log(sdp);
 			});
-		
-			if(sdp.type === "offer"){
-				// l'user recoit une offre, on va l'enregistrer, puis creer et envoyer une réponse
-				pc.createAnswer(OfferAnswer)
-				.then(function(answer) {
-					pc.setLocalDescription(answer);
-				})
-				.then(function() {
-					socket.emit("sdp", pc.localDescription);
-				})
-				.catch(function(err){
-					// en cas d'erreur
-					error("Erreur réception d'une offre sdp par Callee :<br/>"+err);
-					console.log("Erreur réception d'une offre sdp par Callee :");
-					console.log(err);
-					console.log("-----------");
-				});
-			}
 		}
 		// Sinon on recoit un candidate
 		else if(message.type === "candidate"){
