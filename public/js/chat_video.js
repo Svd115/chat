@@ -212,6 +212,7 @@
 				console.log(err);
 				console.log("-----------");
 				console.log(message.sdp);
+				console.log(sdp);
 			});
 		
 			if(sdp.type === "offer"){
