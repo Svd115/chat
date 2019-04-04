@@ -88,7 +88,7 @@
 	
 	function calling_accepted(){
 		accepted_call_animation();
-		start_rtc(true);
+		start_rtc();
 	}
 	
 	function declining_call(){
@@ -136,117 +136,71 @@
 		localVideo.removeAttr("srcObject");
 	}
 	
-	function start_rtc(isCaller){
-		// initialiser la connexion
+	async function start_rtc() {
 		pc = new RTCPeerConnection(configuration);
 		
-		// envoyer un candidate a l'autre user
-		pc.onicecandidate = function(evt){
-			if(evt.candidate){
-				socket.emit("candidate", evt.candidate);
+		// send any ice candidates to the other peer
+		pc.onicecandidate = (event) => {
+			socket.emit("candidate", event.candidate);
+		};
+
+		// let the "negotiationneeded" event trigger offer generation
+		pc.onnegotiationneeded = async () => {
+			try {
+				await pc.setLocalDescription(await pc.createOffer());
+				// send the offer to the other peer
+				socket.emit("sdp", pc.localDescription);
 			}
-		}
-		
-		// l'appelant créé l'offre
-		pc.onnegotiationneeded = () => {
-				pc.createOffer(OfferAnswer)
-				.then(function(offer) {
-					pc.setLocalDescription(offer);
-				})
-				.then(function(){
-					socket.emit("sdp", pc.localDescription);
-				})
-				.catch(function(err){
-					error("Erreur création offre de isCaller :<br/>"+err);
-					console.log("Erreur création offre de isCaller :");
-					console.log(err);
-					console.log("-----------");
-				});
-			}
-		
-		// affiche le flux vidéo de l'autre paire
-		pc.ontrack = (event) => {
-			$("#remote")[0].srcObject = event.streams[0];
-			if($("#remote")[0].srcObject){
-				$("#close_call_btn").css("display", "");
-				$("#remote_video").css("background-image", "none").css("background-color", "black");
+			catch (err) {
+				error("Erreur onnegotiationneeded :<br/>"+err);
+				console.log("Erreur onnegotiationneeded :");
+				console.log(err);
+				console.log("-----------");
 			}
 		};
-		
-		// accéder à la camera
-		navigator.mediaDevices.getUserMedia(constraints)
-		.then(function(stream){
-			// afficher la camera avant de l'envoyer à l'autre paire
+
+		try {
+			// get a local stream, show it in a self-view and add it to be sent
+			const stream = await navigator.mediaDevices.getUserMedia(constraints);
 			$("#local")[0].srcObject = stream;
-			if($("#local")[0].srcObject){
-				$("#local_video").css("background-image", "none").css("background-color", "black");
-			}
-			stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-		})
-		.catch(function(err){
-			// en cas d'erreur
+			// Render the media even before ontrack fires.
+			$("#remote")[0].srcObject = new MediaStream(pc.getReceivers().map((r) => r.track));
+		}
+		catch (err) {
 			error("Erreur getUserMedia :<br/>"+err);
 			console.log("Erreur getUserMedia :");
 			console.log(err);
 			console.log("-----------");
-		});
-	}
+		}
+	};
 	
-	function signaling(message){
-		if(!pc){
-			$("#video").css("display", "");
-			start_rtc(false);
+	async function signaling(message){
+		if (!pc){
+			start_rtc();
 		}
 		
-		// Si on recoit une description
-		if(message.type === "sdp"){
-			var sdp = message.sdp;
-			
-			pc.setRemoteDescription(sdp)
-			.then(function() {
-				if(sdp.type === "offer"){
-					// l'user recoit une offre, on va l'enregistrer, puis creer et envoyer une réponse
-					pc.createAnswer(OfferAnswer)
-					.then(function(answer) {
-						pc.setLocalDescription(answer);
-					})
-					.then(function() {
-						socket.emit("sdp", pc.localDescription);
-					})
-					.catch(function(err){
-						// en cas d'erreur
-						error("Erreur réception d'une offre sdp par Callee :<br/>"+err);
-						console.log("Erreur réception d'une offre sdp par Callee :");
-						console.log(err);
-						console.log("-----------");
-					});
+		try {
+			if (message.type === "sdp"){
+				var sdp = message.sdp;
+
+				// if we get an offer, we need to reply with an answer
+				if (sdp.type == 'offer') {
+					await pc.setRemoteDescription(sdp);
+					await pc.setLocalDescription(await pc.createAnswer());
+					socket.emit("sdp", pc.localDescription);
 				}
-			})
-			.catch(function(err){
-				// en cas d'erreur
-				error("Erreur setRemoteDescription :<br/>"+err);
-				console.log("Erreur setRemoteDescription :");
-				console.log(err);
-				console.log("-----------");
-				console.log(message.sdp);
-				console.log(sdp);
-			});
+				else {
+					await pc.setRemoteDescription(sdp);
+				}
+			}
+			else {
+				await pc.addIceCandidate(message.candidate);
+			}
 		}
-		// Sinon on recoit un candidate
-		else if(message.type === "candidate"){
-			pc.addIceCandidate(message.candidate)
-			.catch(function(err){
-				// en cas d'erreur
-				error("Erreur ice candidate :<br/>"+err);
-				console.log("Erreur ice candidate :");
-				console.log(err);
-				console.log("-----------");
-			});
-		}
-		else{
-			error("Erreur reception de message :<br/>"+message);
-			console.log("Erreur reception de message :");
-			console.log(message);
+		catch (err) {
+			error("Erreur signaling :<br/>"+err);
+			console.log("Erreur signaling :");
+			console.log(err);
 			console.log("-----------");
 		}
 	}
