@@ -164,7 +164,7 @@
 					socket.emit("sdp", pc.localDescription);
 					console.log("Offer send :");
 					console.log("-----------");
-				)}
+				})
 				.catch(function(err){
 					// en cas d'erreur
 					error("Erreur onnegotiationneeded :<br/>"+err);
