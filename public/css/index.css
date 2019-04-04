@@ -138,8 +138,12 @@ html,body{
 }
 
 #local_video{
-	width:100%;
-	height:100%;
+	height:calc(100% / 3);
+	width:calc(100% / 3);
+	position:absolute;
+	bottom:0px;
+	right:0px;
+	border:1px solid grey
 }
 
 .my_messages, .his_messages{
@@ -167,10 +171,6 @@ html,body{
 }
 
 #remote_video{
-	height:calc(100% / 3);
-	width:calc(100% / 3);
-	position:absolute;
-	bottom:0px;
-	right:0px;
-	border:1px solid grey
+	width:100%;
+	height:100%;
 }
