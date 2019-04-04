@@ -201,15 +201,22 @@
 		}
 		
 		// Si on recoit une description
+		// Si on recoit une description
 		if(message.type === "sdp"){
 			var sdp = message.sdp;
-			console.log(message);
+			
+			pc.setRemoteDescription(sdp)
+			.catch(function(err){
+				// en cas d'erreur
+				error("Erreur setRemoteDescription :<br/>"+err);
+				console.log("Erreur setRemoteDescription :");
+				console.log(err);
+				console.log("-----------");
+			});
+		
 			if(sdp.type === "offer"){
 				// l'user recoit une offre, on va l'enregistrer, puis creer et envoyer une réponse
-				pc.setRemoteDescription(sdp)
-				.then(function() {
-					pc.createAnswer(OfferAnswer);
-				})
+				pc.createAnswer(OfferAnswer)
 				.then(function(answer) {
 					pc.setLocalDescription(answer);
 				})
@@ -221,17 +228,6 @@
 					error("Erreur réception d'une offre sdp par Callee :<br/>"+err);
 					console.log("Erreur réception d'une offre sdp par Callee :");
 					console.log(err);
-					console.log("-----------");
-				});
-			}
-			else if(sdp.type === "answer"){
-				pc.setRemoteDescription(sdp)
-				.catch(function(err){
-					// en cas d'erreur
-					error("Erreur setRemoteDescription :<br/>"+err);
-					console.log("Erreur setRemoteDescription :");
-					console.log(err);
-					console.log(sdp);
 					console.log("-----------");
 				});
 			}
