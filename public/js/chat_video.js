@@ -148,11 +148,6 @@
 			}
 		};
 		
-		pc.ontrack = function(event) {
-			$("#remote")[0].srcObject = event.streams[0];
-			$("#remote_video").css("background-image", "none").css("background-color", "black");
-		};
-		
 		if(isOffer){
 			pc.onnegotiationneeded = function() {
 				pc.createOffer()
@@ -177,6 +172,15 @@
 				});
 			}
 		}
+		
+		// affiche le flux vidéo de l'autre paire
+		pc.ontrack = (event) => {
+			$("#remote")[0].srcObject = event.streams[0];
+			if($("#remote")[0].srcObject){
+				$("#close_call_btn").css("display", "");
+				$("#remote_video").css("background-image", "none").css("background-color", "black");
+			}
+		};
 
 		// accéder à la camera
 		navigator.mediaDevices.getUserMedia(constraints)
