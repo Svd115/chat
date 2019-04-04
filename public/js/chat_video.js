@@ -201,7 +201,6 @@
 		}
 		
 		// Si on recoit une description
-		// Si on recoit une description
 		if(message.type === "sdp"){
 			var sdp = message.sdp;
 			
@@ -212,6 +211,7 @@
 				console.log("Erreur setRemoteDescription :");
 				console.log(err);
 				console.log("-----------");
+				console.log(sdp);
 			});
 		
 			if(sdp.type === "offer"){
