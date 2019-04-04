@@ -203,7 +203,7 @@
 		// Si on recoit une description
 		if(message.type === "sdp"){
 			var sdp = message.sdp;
-			
+			console.log(sdp);
 			if(sdp.type === "offer"){
 				// l'user recoit une offre, on va l'enregistrer, puis creer et envoyer une réponse
 				pc.setRemoteDescription(sdp)
