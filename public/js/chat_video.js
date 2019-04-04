@@ -224,7 +224,7 @@
 						console.log("-----------");
 					});
 				}
-			}
+			})
 			.catch(function(err){
 				// en cas d'erreur
 				error("Erreur setRemoteDescription :<br/>"+err);
