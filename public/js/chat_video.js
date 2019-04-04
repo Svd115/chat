@@ -204,20 +204,12 @@
 		if(message.type === "sdp"){
 			var sdp = message.sdp;
 			
-			pc.setRemoteDescription(sdp)
-			.catch(function(err){
-				// en cas d'erreur
-				error("Erreur setRemoteDescription :<br/>"+err);
-				console.log("Erreur setRemoteDescription :");
-				console.log(err);
-				console.log("-----------");
-				console.log(message.sdp);
-				console.log(sdp);
-			});
-		
 			if(sdp.type === "offer"){
 				// l'user recoit une offre, on va l'enregistrer, puis creer et envoyer une réponse
-				pc.createAnswer(OfferAnswer)
+				pc.setRemoteDescription(sdp)
+				.then(function(answer) {
+					pc.createAnswer(OfferAnswer);
+				})
 				.then(function(answer) {
 					pc.setLocalDescription(answer);
 				})
@@ -231,6 +223,19 @@
 					console.log(err);
 					console.log("-----------");
 				});
+			}
+			else if(sdp.type === "answer"){
+				pc.setRemoteDescription(sdp)
+				.catch(function(err){
+					// en cas d'erreur
+					error("Erreur setRemoteDescription ici :<br/>"+err);
+					console.log("Erreur setRemoteDescription :");
+					console.log(err);
+					console.log("-----------");
+					console.log(message.sdp);
+					console.log(sdp);
+				});
+
 			}
 		}
 		// Sinon on recoit un candidate
