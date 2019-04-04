@@ -171,6 +171,9 @@
 					console.log("Erreur onnegotiationneeded :");
 					console.log(err);
 					console.log("-----------");
+					console.log("Erreur onnegotiationneeded pc :");
+					console.log(pc);
+					console.log("-----------");
 				});
 			}
 		}
