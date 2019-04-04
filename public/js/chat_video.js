@@ -210,6 +210,7 @@
 				error("Erreur setRemoteDescription :<br/>"+err);
 				console.log("Erreur setRemoteDescription :");
 				console.log(err);
+				console.log(sdp);
 				console.log("-----------");
 			});
 		
