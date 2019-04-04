@@ -159,6 +159,9 @@
 					socket.emit("sdp", pc.localDescription);
 					console.log("Offer send :");
 					console.log("-----------");
+					console.log("PC :");
+					console.log(pc);
+					console.log("-----------");
 				})
 				.catch(function(err){
 					// en cas d'erreur
