@@ -88,7 +88,7 @@
 	
 	function calling_accepted(){
 		accepted_call_animation();
-		start_rtc();
+		start_rtc(true);
 	}
 	
 	function declining_call(){
@@ -136,93 +136,112 @@
 		localVideo.removeAttr("srcObject");
 	}
 	
-	async function start_rtc() {
+	function start_rtc(isOffer) {
 		pc = new RTCPeerConnection(configuration);
 		
 		// send any ice candidates to the other peer
 		pc.onicecandidate = (event) => {
-			socket.emit("candidate", event.candidate);
-			console.log("Candidate send");
-			console.log("-----------");
-		};
-
-		// let the "negotiationneeded" event trigger offer generation
-		pc.onnegotiationneeded = async () => {
-			try {
-				await pc.setLocalDescription(await pc.createOffer());
-				// send the offer to the other peer
-				socket.emit("sdp", pc.localDescription);
-				console.log("onnegotiationneeded ici");
-				console.log("-----------");
-			}
-			catch (err) {
-				error("Erreur onnegotiationneeded :<br/>"+err);
-				console.log("Erreur onnegotiationneeded :");
-				console.log(err);
+			if (event.candidate) {
+				socket.emit("candidate", event.candidate);
+				console.log("Candidate send");
 				console.log("-----------");
 			}
 		};
+		
+		pc.ontrack = function(event) {
+			$("#remote")[0].srcObject = event.streams[0];
+			$("#remote_video").css("background-image", "none").css("background-color", "black");
+		};
+		
+		if(isOffer){
+			pc.onnegotiationneeded = function() {
+				pc.createOffer()
+				.then(function(offer) {
+					return pc.setLocalDescription(offer);
+				})
+				.then(function() {
+					// Send the offer to the remote peer through the signaling server
+					socket.emit("sdp", pc.localDescription);
+					console.log("Offer send :");
+					console.log("-----------");
+				)}
+				.catch(function(err){
+					// en cas d'erreur
+					error("Erreur onnegotiationneeded :<br/>"+err);
+					console.log("Erreur onnegotiationneeded :");
+					console.log(err);
+					console.log("-----------");
+				});
+			}
+		}
 
-		try {
-			// get a local stream, show it in a self-view and add it to be sent
-			const stream = await navigator.mediaDevices.getUserMedia(constraints);
+		// accéder à la camera
+		navigator.mediaDevices.getUserMedia(constraints)
+		.then(function(stream){
+			// afficher la camera avant de l'envoyer à l'autre paire
 			$("#local")[0].srcObject = stream;
 			if($("#local")[0].srcObject){
 				$("#local_video").css("background-image", "none").css("background-color", "black");
 			}
-			// Render the media even before ontrack fires.
-			$("#remote")[0].srcObject = new MediaStream(pc.getReceivers().map((r) => r.track));
-			if($("#remote")[0].srcObject){
-				$("#close_call_btn").css("display", "");
-				$("#remote_video").css("background-image", "none").css("background-color", "black");
-			}
-			console.log("MediaStream");
-			console.log("-----------");
-		}
-		catch (err) {
+			stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+		})
+		.catch(function(err){
+			// en cas d'erreur
 			error("Erreur getUserMedia :<br/>"+err);
 			console.log("Erreur getUserMedia :");
 			console.log(err);
 			console.log("-----------");
-		}
+		});
 	};
 	
-	async function signaling(message){
+	function signaling(message){
 		if (!pc){
-			console.log("callee")
+			console.log("callee start")
 			console.log("-----------");
-			start_rtc();
+			start_rtc(false);
 		}
 		
-		try {
-			if (message.type === "sdp"){
-				var sdp = message.sdp;
+		if (message.type === "sdp"){
+			var sdp = message.sdp;
 
-				// if we get an offer, we need to reply with an answer
-				if (sdp.type == 'offer') {
-					await pc.setRemoteDescription(sdp);
-					await pc.setLocalDescription(await pc.createAnswer());
-					socket.emit("sdp", pc.localDescription);
-					console.log("get offer");
-					console.log("-----------");
-				}
-				else {
-					await pc.setRemoteDescription(sdp);
-					console.log("get answer");
-					console.log("-----------");
+			pc.setRemoteDescription(new RTCSessionDescription(sdp))
+			.then(function (){
+				if (pc.remoteDescription.type == "offer"){
+					pc.createAnswer()
+					.then(function(answer) {
+						return pc.setLocalDescription(answer);
+					})
+					.then(function(answer) {
+						socket.emit("sdp", pc.localDescription);
+						console.log("get offer");
+						console.log("-----------");
+					})
+					.catch(function(err){
+						// en cas d'erreur
+						error("Erreur createAnswer :<br/>"+err);
+						console.log("Erreur createAnswer :");
+						console.log(err);
+						console.log("-----------");
+					});
 				}
 			}
-			else {
-				await pc.addIceCandidate(message.candidate);
-				console.log("get candidate");
+			.catch(function(err){
+				// en cas d'erreur
+				error("Erreur setRemoteDescription :<br/>"+err);
+				console.log("Erreur setRemoteDescription :");
+				console.log(err);
 				console.log("-----------");
-			}
+			});
 		}
-		catch (err) {
-			error("Erreur signaling :<br/>"+err);
-			console.log("Erreur signaling :");
-			console.log(err);
-			console.log("-----------");
+		else {
+			pc.addIceCandidate(new RTCIceCandidate(message.candidate))
+			.catch(function(err){
+				// en cas d'erreur
+				error("Erreur ice candidate :<br/>"+err);
+				console.log("Erreur ice candidate :");
+				console.log(err);
+				console.log("-----------");
+			});
 		}
 	}
 	
