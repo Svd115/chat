@@ -167,8 +167,15 @@
 			// get a local stream, show it in a self-view and add it to be sent
 			const stream = await navigator.mediaDevices.getUserMedia(constraints);
 			$("#local")[0].srcObject = stream;
+			if($("#local")[0].srcObject){
+				$("#local_video").css("background-image", "none").css("background-color", "black");
+			}
 			// Render the media even before ontrack fires.
 			$("#remote")[0].srcObject = new MediaStream(pc.getReceivers().map((r) => r.track));
+			if($("#remote")[0].srcObject){
+				$("#close_call_btn").css("display", "");
+				$("#remote_video").css("background-image", "none").css("background-color", "black");
+			}
 			console.log("MediaStream");
 			console.log("-----------");
 		}
@@ -182,7 +189,8 @@
 	
 	async function signaling(message){
 		if (!pc){
-			$("#video").css("display", "");
+			console.log("callee")
+			console.log("-----------");
 			start_rtc();
 		}
 		
