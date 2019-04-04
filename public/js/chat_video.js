@@ -206,7 +206,10 @@
 			
 			if(sdp.type === "offer"){
 				// l'user recoit une offre, on va l'enregistrer, puis creer et envoyer une réponse
-				pc.createAnswer(OfferAnswer)
+				pc.setRemoteDescription(sdp)
+				.then(function() {
+					pc.createAnswer(OfferAnswer);
+				})
 				.then(function(answer) {
 					pc.setLocalDescription(answer);
 				})
