@@ -134,7 +134,7 @@
 				const constraints = {audio: {echoCancellation: true}, video: { facingMode: "user" }};
 				const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]};
 				let pc;
-				let OfferAnswer = {'offerToReceiveAudio':false,'offerToReceiveVideo':false};
+				let OfferAnswer = {'offerToReceiveAudio':true,'offerToReceiveVideo':true};
 				
 				function infos(level, message, permanent = false){
 					var level = "alert-"+level;
