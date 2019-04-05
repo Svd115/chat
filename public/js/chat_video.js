@@ -230,7 +230,7 @@
 					})
 					.then(function(){
 						return pc.createAnswer(OfferAnswer);
-					});
+					})
 					.then(function(answer) {
 						return pc.setLocalDescription(new RTCSessionDescription(answer));
 					})
