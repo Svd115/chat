@@ -148,36 +148,7 @@
 			}
 		};
 		
-		if(isOffer){
-			/*
-			pc.onnegotiationneeded = function() {
-				pc.createOffer()
-				.then(function(offer) {
-					return pc.setLocalDescription(new RTCSessionDescription(offer));
-				})
-				.then(function() {
-					// Send the offer to the remote peer through the signaling server
-					socket.emit("sdp", pc.localDescription);
-					console.log("PC :");
-					console.log(pc);
-					console.log("-----------");
-					console.log("Offer send :");
-					console.log("-----------");
-				})
-				.catch(function(err){
-					// en cas d'erreur
-					error("Erreur onnegotiationneeded :<br/>"+err);
-					console.log("Erreur onnegotiationneeded :");
-					console.log(err);
-					console.log("-----------");
-					console.log("Erreur onnegotiationneeded pc :");
-					console.log(pc);
-					console.log("-----------");
-				});
-			}
-			*/
-			
-			pc.onnegotiationneeded = async () => {
+		pc.onnegotiationneeded = async () => {
 				try {
 					if (negotiating || pc.signalingState != "stable") return;
 					negotiating = true;
@@ -207,7 +178,6 @@
 					negotiating = false;
 				}
 			}
-		}
 		
 		// affiche le flux vidéo de l'autre paire
 		pc.ontrack = (event) => {
