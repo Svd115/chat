@@ -132,7 +132,7 @@
 				
 				let negotiating = false;
 				const constraints = {audio: {echoCancellation: true}, video: { facingMode: "user" }};
-				const configuration = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'}]};
+				const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]};
 				let pc;
 				let OfferAnswer = {'offerToReceiveAudio':false,'offerToReceiveVideo':false};
 				
