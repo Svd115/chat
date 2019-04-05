@@ -219,18 +219,20 @@
 			var sdp = message.sdp;
 
 			pc.setRemoteDescription(new RTCSessionDescription(sdp))
-			.then(function(){
-				return navigator.mediaDevices.getUserMedia(constraints);
-			})
-			.then(function(stream){
-				// afficher la camera avant de l'envoyer à l'autre paire
-				$("#local")[0].srcObject = stream;
-				$("#local_video").css("background-image", "none").css("background-color", "black");
-				stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-			})
 			.then(function (){
 				if (pc.remoteDescription.type == "offer"){
-					pc.createAnswer(OfferAnswer)
+					function(){
+						return navigator.mediaDevices.getUserMedia(constraints);
+					}
+					.then(function(stream){
+						// afficher la camera avant de l'envoyer à l'autre paire
+						$("#local")[0].srcObject = stream;
+						$("#local_video").css("background-image", "none").css("background-color", "black");
+						stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+					})
+					.then(function(){
+						return pc.createAnswer(OfferAnswer);
+					});
 					.then(function(answer) {
 						return pc.setLocalDescription(new RTCSessionDescription(answer));
 					})
