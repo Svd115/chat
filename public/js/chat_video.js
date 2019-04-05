@@ -231,7 +231,7 @@
 						stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 					})
 					.then(function(){
-						return pc.createAnswer(OfferAnswer);
+						return pc.createAnswer();
 					})
 					.then(function(answer) {
 						return pc.setLocalDescription(new RTCSessionDescription(answer));
