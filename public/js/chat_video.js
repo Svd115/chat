@@ -183,7 +183,7 @@
 					negotiating = true;
 					
 					try {
-						await pc.setLocalDescription(await pc.createOffer());
+						await pc.setLocalDescription(await pc.createOffer(OfferAnswer));
 						// Send the offer to the remote peer through the signaling server
 						socket.emit("sdp", pc.localDescription);
 						console.log("PC :");
@@ -249,7 +249,7 @@
 			pc.setRemoteDescription(new RTCSessionDescription(sdp))
 			.then(function (){
 				if (pc.remoteDescription.type == "offer"){
-					pc.createAnswer()
+					pc.createAnswer(OfferAnswer)
 					.then(function(answer) {
 						return pc.setLocalDescription(new RTCSessionDescription(answer));
 					})
