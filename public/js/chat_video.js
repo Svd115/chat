@@ -221,9 +221,7 @@
 			pc.setRemoteDescription(new RTCSessionDescription(sdp))
 			.then(function (){
 				if (pc.remoteDescription.type == "offer"){
-					function(){
-						return navigator.mediaDevices.getUserMedia(constraints);
-					}
+					navigator.mediaDevices.getUserMedia(constraints)
 					.then(function(stream){
 						// afficher la camera avant de l'envoyer à l'autre paire
 						$("#local")[0].srcObject = stream;
