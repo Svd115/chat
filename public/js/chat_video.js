@@ -211,7 +211,7 @@
 		
 		// affiche le flux vidéo de l'autre paire
 		pc.ontrack = (event) => {
-			if (($("#remote")[0].srcObject) return;
+			if (($("#remote")[0].srcObject)) return;
 			console.log("ontrack remote");
 			$("#remote")[0].srcObject = event.streams[0];
 			$("#close_call_btn").css("display", "");
