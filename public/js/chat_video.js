@@ -149,6 +149,7 @@
 		};
 		
 		if(isOffer){
+			/*
 			pc.onnegotiationneeded = function() {
 				pc.createOffer()
 				.then(function(offer) {
@@ -173,6 +174,38 @@
 					console.log(pc);
 					console.log("-----------");
 				});
+			}
+			*/
+			
+			pc.onnegotiationneeded = async () => {
+				try {
+					if (negotiating || pc.signalingState != "stable") return;
+					negotiating = true;
+					
+					try {
+						await pc.setLocalDescription(await pc.createOffer());
+						// Send the offer to the remote peer through the signaling server
+						socket.emit("sdp", pc.localDescription);
+						console.log("PC :");
+						console.log(pc);
+						console.log("-----------");
+						console.log("Offer send :");
+						console.log("-----------");
+					} 
+					catch (err) {
+						// en cas d'erreur
+						error("Erreur onnegotiationneeded :<br/>"+err);
+						console.log("Erreur onnegotiationneeded :");
+						console.log(err);
+						console.log("-----------");
+						console.log("Erreur onnegotiationneeded pc :");
+						console.log(pc);
+						console.log("-----------");
+					}
+				}
+				finally {
+					negotiating = false;
+				}
 			}
 		}
 		
