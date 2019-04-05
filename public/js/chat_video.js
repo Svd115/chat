@@ -148,6 +148,23 @@
 			}
 		};
 		
+		// accéder à la camera
+		navigator.mediaDevices.getUserMedia(constraints)
+		.then(function(stream){
+			// afficher la camera avant de l'envoyer à l'autre paire
+			$("#local")[0].srcObject = stream;
+			$("#local_video").css("background-image", "none").css("background-color", "black");
+			
+			stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+		})
+		.catch(function(err){
+			// en cas d'erreur
+			error("Erreur getUserMedia :<br/>"+err);
+			console.log("Erreur getUserMedia :");
+			console.log(err);
+			console.log("-----------");
+		});
+		
 		if(isOffer){
 			/*
 			pc.onnegotiationneeded = function() {
@@ -217,23 +234,6 @@
 			$("#close_call_btn").css("display", "");
 			$("#remote_video").css("background-image", "none").css("background-color", "black");
 		};
-
-		// accéder à la camera
-		navigator.mediaDevices.getUserMedia(constraints)
-		.then(function(stream){
-			// afficher la camera avant de l'envoyer à l'autre paire
-			$("#local")[0].srcObject = stream;
-			$("#local_video").css("background-image", "none").css("background-color", "black");
-			
-			stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-		})
-		.catch(function(err){
-			// en cas d'erreur
-			error("Erreur getUserMedia :<br/>"+err);
-			console.log("Erreur getUserMedia :");
-			console.log(err);
-			console.log("-----------");
-		});
 	};
 	
 	function signaling(message){
