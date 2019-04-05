@@ -207,6 +207,8 @@
 					negotiating = false;
 				}
 			}
+			
+			get_user_media();
 		}
 		
 		// affiche le flux vidéo de l'autre paire
@@ -218,6 +220,10 @@
 			$("#remote_video").css("background-image", "none").css("background-color", "black");
 		};
 
+		
+	};
+	
+	function get_user_media(){
 		// accéder à la camera
 		navigator.mediaDevices.getUserMedia(constraints)
 		.then(function(stream){
@@ -234,7 +240,7 @@
 			console.log(err);
 			console.log("-----------");
 		});
-	};
+	}
 	
 	function signaling(message){
 		if (!pc){
@@ -249,6 +255,7 @@
 			pc.setRemoteDescription(new RTCSessionDescription(sdp))
 			.then(function (){
 				if (pc.remoteDescription.type == "offer"){
+					get_user_media();
 					pc.createAnswer(OfferAnswer)
 					.then(function(answer) {
 						return pc.setLocalDescription(new RTCSessionDescription(answer));
