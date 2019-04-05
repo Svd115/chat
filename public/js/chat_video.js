@@ -224,6 +224,8 @@
 					navigator.mediaDevices.getUserMedia(constraints)
 					.then(function(stream){
 						// afficher la camera avant de l'envoyer à l'autre paire
+						console.log("getUserMedia");
+						console.log("-----------");
 						$("#local")[0].srcObject = stream;
 						$("#local_video").css("background-image", "none").css("background-color", "black");
 						stream.getTracks().forEach((track) => pc.addTrack(track, stream));
