@@ -148,23 +148,6 @@
 			}
 		};
 		
-		// accéder à la camera
-		navigator.mediaDevices.getUserMedia(constraints)
-		.then(function(stream){
-			// afficher la camera avant de l'envoyer à l'autre paire
-			$("#local")[0].srcObject = stream;
-			$("#local_video").css("background-image", "none").css("background-color", "black");
-			
-			stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-		})
-		.catch(function(err){
-			// en cas d'erreur
-			error("Erreur getUserMedia :<br/>"+err);
-			console.log("Erreur getUserMedia :");
-			console.log(err);
-			console.log("-----------");
-		});
-		
 		if(isOffer){
 			/*
 			pc.onnegotiationneeded = function() {
@@ -224,6 +207,24 @@
 					negotiating = false;
 				}
 			}
+			
+			// accéder à la camera
+			navigator.mediaDevices.getUserMedia(constraints)
+			.then(function(stream){
+				// afficher la camera avant de l'envoyer à l'autre paire
+				$("#local")[0].srcObject = stream;
+				$("#local_video").css("background-image", "none").css("background-color", "black");
+				
+				stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+			})
+			.catch(function(err){
+				// en cas d'erreur
+				error("Erreur getUserMedia :<br/>"+err);
+				console.log("Erreur getUserMedia :");
+				console.log(err);
+				console.log("-----------");
+			});
+	
 		}
 		
 		// affiche le flux vidéo de l'autre paire
@@ -234,6 +235,7 @@
 			$("#close_call_btn").css("display", "");
 			$("#remote_video").css("background-image", "none").css("background-color", "black");
 		};
+
 	};
 	
 	function signaling(message){
@@ -254,9 +256,28 @@
 						return pc.setLocalDescription(new RTCSessionDescription(answer));
 					})
 					.then(function(answer) {
-						socket.emit("sdp", pc.localDescription);
-						console.log("get offer");
-						console.log("-----------");
+						// accéder à la camera
+						navigator.mediaDevices.getUserMedia(constraints)
+						.then(function(stream){
+							// afficher la camera avant de l'envoyer à l'autre paire
+							$("#local")[0].srcObject = stream;
+							$("#local_video").css("background-image", "none").css("background-color", "black");
+							
+							stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+						})
+						.then(function(stream){
+							socket.emit("sdp", pc.localDescription);
+							console.log("get offer");
+							console.log("-----------");
+
+						})
+						.catch(function(err){
+							// en cas d'erreur
+							error("Erreur getUserMedia :<br/>"+err);
+							console.log("Erreur getUserMedia :");
+							console.log(err);
+							console.log("-----------");
+						});
 					})
 					.catch(function(err){
 						// en cas d'erreur
